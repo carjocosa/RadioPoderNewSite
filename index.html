@@ -1209,6 +1209,32 @@
     /* ---------- Carátulas + preview (iTunes primario, Deezer fallback) ---------- */
     var ART_CACHE = {};
     var artSeq = 0;
+    // Cola con concurrencia limitada para no saturar el throttling de Apple.
+    var artQueue = [];
+    var artActive = 0;
+    var ART_CONCURRENCY = 3;
+    var ART_DELAY = 320; // ms entre arranques de lote (respetar throttling de Apple)
+    function artEnqueue(fn, onDone) {
+      artQueue.push({ run: fn, done: onDone });
+      artPump();
+    }
+    function artPump() {
+      if (artActive >= ART_CONCURRENCY) return;
+      var job = artQueue.shift();
+      if (!job) return;
+      artActive++;
+      job.run().then(function (r) {
+        artActive--;
+        if (job.done) job.done(r);
+        if (ART_DELAY) setTimeout(artPump, ART_DELAY);
+        else artPump();
+      }, function () {
+        artActive--;
+        if (job.done) job.done(null);
+        if (ART_DELAY) setTimeout(artPump, ART_DELAY);
+        else artPump();
+      });
+    }
 
     function escAttr(s) { return String(s == null ? "" : s).replace(/"/g, "&quot;"); }
 
@@ -1224,18 +1250,60 @@
         return;
       }
       setPh('<b>♪</b>');
-      fetchFromItunes(tema, artista).then(function (r) {
-        if (r) { ART_CACHE[key] = r; if (img) img.setAttribute("src", r.img); setPh(""); return; }
-        return fetchFromDeezer(tema, artista).then(function (r2) {
-          if (r2) { ART_CACHE[key] = r2; if (img) img.setAttribute("src", r2.img); setPh(""); }
-          else { ART_CACHE[key] = { img: "" }; setPh("—"); }
-        });
+      artEnqueue(function () {
+        // Cada fuente es tolerante a errores; si iTunes falla (throttle), probamos Deezer.
+        return fetchFromItunes(tema, artista)
+          .catch(function () { return null; })
+          .then(function (r) {
+            if (r) return r;
+            return fetchFromDeezer(tema, artista).catch(function () { return null; });
+          });
+      }, function (r) {
+        if (r) { ART_CACHE[key] = r; if (img) img.setAttribute("src", r.img); setPh(""); }
+        else { ART_CACHE[key] = { img: "" }; setPh("—"); }
       });
+    }
+
+    // ---------- Búsqueda contextual (fuzzy) ----------
+    // Normaliza texto: minúsculas, quita acentos y caracteres no alfanuméricos.
+    function norm(s) {
+      return String(s || "")
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, " ");
+    }
+    // Similitud de tokens: Jaccard + coincidencia de subcadena.
+    function simScore(a, b) {
+      var A = norm(a), B = norm(b);
+      if (!A || !B) return 0;
+      if (A === B) return 1;
+      var ta = A.split(" ").filter(Boolean), tb = B.split(" ").filter(Boolean);
+      var inter = ta.filter(function (x) { return tb.indexOf(x) !== -1; }).length;
+      var jac = inter / (ta.length + tb.length - inter || 1);
+      var sub = 0;
+      if (A.indexOf(B) !== -1 || B.indexOf(A) !== -1) sub = 1;
+      var cn = 0;
+      if (ta.some(function (x) { return tb.indexOf(x) !== -1 && x.length > 2; })) cn = 1;
+      return Math.max(jac * 0.9, sub * 0.85, cn * 0.6);
+    }
+    // Elige el resultado con mejor combinación artista+tema (pesa la canción).
+    function pick(results, tema, artista) {
+      var best = null, bestScore = 0;
+      for (var i = 0; i < results.length; i++) {
+        var r = results[i];
+        var aName = r.artistName || r.artistNameGlobal || "";
+        var tName = r.trackName || r.collectionName || "";
+        var sTema = simScore(norm(tema), tName);
+        var sArt = simScore(norm(artista), aName);
+        var score = sTema * 0.6 + sArt * 0.4;
+        if (score > bestScore) { bestScore = score; best = r; }
+      }
+      return bestScore > 0.35 ? best : (results[0] || null);
     }
 
     function fetchFromItunes(tema, artista) {
       var term = encodeURIComponent(artista + " " + tema);
-      return fetch("https://itunes.apple.com/search?term=" + term + "&media=music&entity=song&limit=3")
+      return fetch("https://itunes.apple.com/search?term=" + term + "&media=music&entity=song&limit=10")
         .then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); })
         .then(function (j) {
           var hit = pick(j.results || [], tema, artista);
@@ -1247,34 +1315,25 @@
 
     function fetchFromDeezer(tema, artista) {
       var term = encodeURIComponent(artista + " " + tema);
-      return fetch("https://api.deezer.com/search?q=" + term + "&limit=5&order=RANKING")
+      return fetch("https://api.deezer.com/search?q=" + term + "&limit=10&order=RANKING")
         .then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); })
         .then(function (j) {
           var arr = j.data || [];
           if (!arr.length) return null;
-          // Elegir el mejor match por artista
-          var al = artista.toLowerCase();
-          var hit = (al && arr.find(function (d) { return (d.artist && d.artist.name || "").toLowerCase().indexOf(al) !== -1; })) || arr[0];
+          var best = null, bestScore = 0;
+          for (var i = 0; i < arr.length; i++) {
+            var d = arr[i];
+            var tName = d.title || "";
+            var aName = (d.artist && d.artist.name) || "";
+            var sTema = simScore(norm(tema), tName);
+            var sArt = simScore(norm(artista), aName);
+            var score = sTema * 0.6 + sArt * 0.4;
+            if (score > bestScore) { bestScore = score; best = d; }
+          }
+          var hit = bestScore > 0.35 ? best : arr[0];
           return { img: hit.album && hit.album.cover_big ? hit.album.cover_big : "", prev: hit.preview || "" };
         })
         .catch(function () { return null; });
-    }
-
-    // Heurística: prefiera el resultado cuyo artista coincida mejor
-    function pick(results, tema, artista) {
-      var al = (artista || "").toLowerCase();
-      var tl = (tema || "").toLowerCase();
-      for (var i = 0; i < results.length; i++) {
-        var r = results[i];
-        var a = (r.artistName || "").toLowerCase();
-        var t = (r.trackName || "").toLowerCase();
-        if (al && a.indexOf(al) !== -1 && tl && t.indexOf(tl) !== -1) return r;
-      }
-      for (var j = 0; j < results.length; j++) {
-        var r2 = results[j];
-        if (al && (r2.artistName || "").toLowerCase().indexOf(al) !== -1) return r2;
-      }
-      return results[0] || null;
     }
 
     /* ---------- Preview audio en el modal ---------- */
