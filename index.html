@@ -1125,7 +1125,7 @@
       el.innerHTML = items.map(function (it, idx) {
         var pos = numbered && !isNaN(it.pos) ? it.pos : (idx + 1);
         var cls = numbered && pos <= 3 ? " top3" : "";
-        var pct = (it.artist && it.artist.indexOf("%") !== -1) ? it.artist : it.artist || "";
+        var pct = it.artista || "";
         var delta = numbered ? renderDelta(it.prev, pos) : "";
         return '<div class="chart-row' + cls + '">' +
           '<div class="pos">' + pos + '</div>' +
@@ -1186,7 +1186,7 @@
         grid.innerHTML = '<div class="news-fallback">NO HAY NOTICIAS DISPONIBLES<br>el feed no devolvió contenido</div>';
         return;
       }
-      grid.innerHTML = all.map(function (n, i) {
+      grid.innerHTML = all.slice(0, 9).map(function (n, i) {
         var img = n.img
           ? '<img src="' + esc(n.img) + '" alt="' + esc(n.title) + '" loading="lazy" onerror="this.style.display=\'none\'">'
           : "";
