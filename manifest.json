@@ -1,0 +1,43 @@
+{
+  "name": "Radio Poder 95.3 FM",
+  "short_name": "Radio Poder",
+  "description": "Radio Poder 95.3 FM. Música en vivo, programación, noticias y los golpes de la semana.",
+  "start_url": ".",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#0c0f0a",
+  "theme_color": "#0c0f0a",
+  "scope": ".",
+  "categories": ["music", "entertainment", "news"],
+  "lang": "es-EC",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Programación",
+      "short_name": "Programación",
+      "url": "./index.html#programacion",
+      "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Golpes de la semana",
+      "short_name": "Golpes",
+      "url": "./index.html#golpes",
+      "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Noticias",
+      "short_name": "Noticias",
+      "url": "./index.html#noticias",
+      "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ],
+  "prefer_related_applications": false
+}

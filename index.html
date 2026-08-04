@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Radio Poder 95.3 FM | Transmisión en vivo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Radio Poder 95.3 FM. Música en vivo, programación, noticias y los golpes de la semana. Somos parte de tu vida." />
+  <meta name="theme-color" content="#0a0c08" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Radio Poder" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Saira:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --ink: #0a0c08;
+      --ink-2: #10130d;
+      --ink-3: #161a12;
+      --panel: #141810;
+      --paper: #f0f2e6;
+      --muted: #a6ad97;
+      --dim: #737b63;
+      --lime: #a2c614;
+      --lime-hi: #cff34f;
+      --lime-deep: #5c7a08;
+      --warm: #e8e6d8;
+      --red: #ff4d3d;
+      --amber: #ffc73d;
+      --line: rgba(162, 198, 20, 0.15);
+      --hair: rgba(240, 242, 230, 0.14);
+      --maxw: 1200px;
+      --disp: "Saira Condensed", sans-serif;
+      --body: "Saira", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--body);
+      background: var(--ink);
+      color: var(--paper);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    ::selection { background: var(--lime); color: var(--ink); }
+
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.5rem); }
+
+    /* ---------- Broadcast texture ---------- */
+    .scanlines {
+      position: fixed; inset: 0; z-index: 9998; pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.28) 0 1px, transparent 1px 3px);
+      mix-blend-mode: multiply; opacity: 0.5;
+    }
+    .noise {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ---------- Animated page background ---------- */
+    .bg-aurora {
+      position: fixed; inset: -20% -20% auto; z-index: -1; pointer-events: none;
+      height: 140%; background:
+        radial-gradient(38% 34% at 22% 16%, rgba(162,198,20,0.13), transparent 62%),
+        radial-gradient(30% 26% at 82% 10%, rgba(92,122,8,0.20), transparent 60%),
+        radial-gradient(24% 22% at 60% 60%, rgba(162,198,20,0.06), transparent 65%);
+      filter: blur(2px);
+      animation: aurora 22s ease-in-out infinite alternate;
+    }
+    @keyframes aurora {
+      0%   { transform: translate3d(-1.5%, -1%, 0) rotate(0deg) scale(1); }
+      50%  { transform: translate3d(1.5%, 1.5%, 0) rotate(1.5deg) scale(1.06); }
+      100% { transform: translate3d(-1.5%, -1%, 0) rotate(0deg) scale(1); }
+    }
+    .bg-dots {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+    }
+    .bg-dots i {
+      position: absolute; bottom: -6vh; width: 2px; height: 2px; border-radius: 50%;
+      background: var(--lime); opacity: 0; animation: rise linear infinite;
+    }
+    .bg-dots i:nth-child(1) { left: 6%;  animation-duration: 18s; animation-delay: 0s; }
+    .bg-dots i:nth-child(2) { left: 14%; animation-duration: 26s; animation-delay: -6s; }
+    .bg-dots i:nth-child(3) { left: 24%; animation-duration: 21s; animation-delay: -12s; }
+    .bg-dots i:nth-child(4) { left: 38%; animation-duration: 30s; animation-delay: -3s; }
+    .bg-dots i:nth-child(5) { left: 52%; animation-duration: 19s; animation-delay: -9s; }
+    .bg-dots i:nth-child(6) { left: 66%; animation-duration: 27s; animation-delay: -15s; }
+    .bg-dots i:nth-child(7) { left: 78%; animation-duration: 22s; animation-delay: -2s; }
+    .bg-dots i:nth-child(8) { left: 90%; animation-duration: 25s; animation-delay: -11s; }
+    @keyframes rise {
+      0%   { transform: translateY(0); opacity: 0; }
+      12%  { opacity: 0.7; }
+      85%  { opacity: 0.25; }
+      100% { transform: translateY(-120vh); opacity: 0; }
+    }
+
+    /* ---------- Technical label ---------- */
+    .tag {
+      font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--lime);
+    }
+    .tag .lbl { color: var(--dim); }
+
+    /* ---------- Ticker tape ---------- */
+    .tape {
+      position: relative;
+      background: var(--ink-3);
+      border-bottom: 1px solid var(--line);
+      overflow: hidden;
+      padding: 0.45rem 0;
+      display: flex; align-items: center;
+      white-space: nowrap;
+    }
+    .tape .rail {
+      position: absolute; left: 0; top: 0; bottom: 0; z-index: 2;
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0 0.7rem;
+      background: var(--lime); color: var(--ink);
+      font-family: var(--disp); font-weight: 800; font-size: 0.75rem;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+      padding-right: 1.1rem;
+    }
+    .tape .rail svg { width: 13px; height: 13px; }
+    .tape .stream { display: inline-flex; animation: tape 30s linear infinite; gap: 0; }
+    .tape .stream span {
+      display: inline-flex; align-items: center; gap: 1.4rem;
+      font-family: var(--disp); font-weight: 600; font-size: 0.83rem;
+      letter-spacing: 0.06em; color: var(--warm); padding: 0 1.4rem;
+      text-transform: uppercase;
+    }
+    .tape .stream b { color: var(--lime-hi); font-weight: 700; }
+    .tape .stream i { color: var(--dim); font-style: normal; }
+    @keyframes tape { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* ---------- Player bar (fixed top) ---------- */
+    #playerbar {
+      position: sticky; top: 0; z-index: 60;
+      background: rgba(10, 12, 8, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+    }
+    #playerbar .wrap {
+      display: flex; align-items: center; gap: 1rem;
+      padding-top: 0.55rem; padding-bottom: 0.55rem;
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; margin-right: auto; min-width: 0; position: relative; }
+    .hero-logo {
+      display: block; width: 100%; max-width: 100%; height: auto; object-fit: contain;
+      filter: drop-shadow(0 0 24px rgba(162,198,20,0.25));
+      margin: auto 0;
+    }
+    .brand .mark { display: grid; place-items: center; width: 2.3rem; height: 2.3rem; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); flex-shrink: 0; color: var(--lime); position: relative; }
+    .brand .word {
+      font-family: var(--disp); font-weight: 800; font-size: 1.25rem; line-height: 0.95;
+      text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap;
+    }
+    .brand .word b { color: var(--lime); }
+    .brand .sub { font-family: var(--mono); font-size: 0.58rem; color: var(--dim); letter-spacing: 0.2em; }
+
+    .meta-readout { display: flex; flex-direction: column; min-width: 0; align-items: flex-end; }
+    .meta-readout .nm {
+      font-family: var(--mono); font-size: 0.78rem; color: var(--paper); white-space: nowrap;
+      max-width: 34ch; overflow: hidden; text-overflow: ellipsis;
+    }
+    .meta-readout .nm b { color: var(--lime-hi); font-weight: 500; }
+    .meta-readout .tm { font-family: var(--mono); font-size: 0.6rem; color: var(--dim); letter-spacing: 0.08em; }
+
+    .live-pill {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      font-family: var(--mono); font-weight: 700; font-size: 0.68rem; letter-spacing: 0.14em;
+      color: #fff; background: rgba(255, 77, 61, 0.14); border: 1px solid rgba(255,77,61,0.5);
+      padding: 0.32rem 0.7rem; white-space: nowrap;
+      text-transform: uppercase;
+    }
+    .live-pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: blink 1.4s ease-in-out infinite; }
+    .live-pill.onair { border-color: rgba(162,198,20,0.55); background: rgba(162,198,20,0.12); }
+    .live-pill.onair::before { background: var(--lime); }
+    .live-pill.idle { border-color: rgba(240,242,230,0.3); background: transparent; }
+    .live-pill.idle::before { background: var(--dim); }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+    .playbtn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      font-family: var(--disp); font-weight: 800; font-size: 1.02rem; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--ink);
+      background: var(--lime); border: none; padding: 0.62rem 1.4rem;
+      cursor: pointer; transition: transform 0.14s, background 0.2s, filter 0.2s;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 12px 100%);
+      white-space: nowrap;
+    }
+    .playbtn:hover { background: var(--lime-hi); }
+    .playbtn:active { transform: translateY(1px); }
+    .playbtn.playing { background: var(--red); color: #fff; }
+    .playbtn svg { flex-shrink: 0; }
+
+    .playbtn.idle {
+      animation: attention 2.2s ease-in-out infinite;
+      box-shadow: 0 0 0 0 rgba(162,198,20,0.6);
+    }
+    @keyframes attention {
+      0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(162,198,20,0.55); }
+      38%  { transform: scale(1.06); box-shadow: 0 0 0 14px rgba(162,198,20,0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(162,198,20,0); }
+    }
+    .playbtn.idle .txt { letter-spacing: 0.02em; }
+    .playbtn .hint {
+      font-family: var(--mono); font-size: 0.58rem; font-weight: 500; letter-spacing: 0.08em;
+      color: rgba(10,12,8,0.65); display: none;
+    }
+    .playbtn.idle .hint { display: inline; }
+
+    /* ---------- Hero ---------- */
+    #top { position: relative; overflow: hidden; }
+    #top .wrap { padding-top: clamp(2.5rem, 6vw, 4.5rem); padding-bottom: clamp(3rem, 8vw, 6rem); }
+
+    .hero-bg { position: absolute; inset: 0; z-index: -1; background: var(--ink); }
+    .hero-bg::before {
+      content: ""; position: absolute; inset: 0;
+      background:
+        radial-gradient(60% 50% at 78% 0%, rgba(162,198,20,0.14), transparent 60%),
+        radial-gradient(50% 40% at 0% 100%, rgba(92,122,8,0.2), transparent 60%);
+    }
+
+    .hero-topline { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 1.4rem; flex-wrap: wrap; }
+    .hero-topline .clk { font-family: var(--mono); color: var(--dim); font-size: 0.72rem; letter-spacing: 0.12em; }
+
+    /* Frequency monument */
+    .freq-hero { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; align-items: stretch; margin-bottom: 2.2rem; }
+    .freq-num {
+      position: relative; border: 1px solid var(--line); background: var(--panel);
+      padding: 1rem 1.4rem 1.2rem; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;
+    }
+    .freq-num::before { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, rgba(162,198,20,0.06), transparent 40%); pointer-events: none; }
+    .freq-num .capt {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim);
+    }
+    .freq-num .capt .call { color: var(--lime); }
+
+    .dial-panel {
+      border: 1px solid var(--line); background: var(--panel);
+      padding: 0.7rem 1rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.7rem;
+    }
+    .dial-scale { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.6rem; color: var(--dim); padding: 0.3rem 0 0; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); letter-spacing: 0.1em; }
+    .vumeter { display: flex; gap: 2px; align-items: flex-end; height: 34px; }
+    .vumeter i {
+      flex: 1; background: linear-gradient(to top, var(--lime-deep), var(--lime) 70%, var(--lime-hi));
+      opacity: 0.9; transform-origin: bottom; height: 6%;
+      transition: height 80ms ease-out;
+      will-change: height;
+    }
+    .vumeter i.hot { background: linear-gradient(to top, #a33b00, var(--amber) 70%, var(--amber)); }
+    @keyframes vuPanic { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .vumeter.paused i { height: 6% !important; opacity: 0.25; }
+
+    .dial-readout { display: flex; justify-content: space-between; gap: 1rem; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.12em; color: var(--dim); text-transform: uppercase; }
+    .dial-readout b { color: var(--paper); font-weight: 500; }
+
+    /* Now playing console */
+    .now-cab {
+      border: 1px solid var(--line); background: var(--panel);
+      display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 1rem; align-items: center;
+      padding: 1.3rem 1.4rem; position: relative; overflow: hidden;
+    }
+    .now-cab::after { content: ""; position: absolute; top: 0; right: 0; width: 40%; height: 1px; background: linear-gradient(90deg, transparent, var(--lime)); }
+    .now-cab .left { min-width: 0; }
+    .now-cab .left .row1 { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.5rem; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); }
+    .now-cab .left .row1 .rec { color: var(--red); }
+    .now-cab .pname { font-family: var(--disp); font-weight: 800; font-size: clamp(1.8rem, 4vw, 2.7rem); line-height: 1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .now-cab .ptime { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); margin-top: 0.4rem; }
+
+    .now-cab .now-play {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.45rem;
+      border: none; cursor: pointer;
+      background: var(--lime); color: var(--ink);
+      padding: 1rem 1.6rem;
+      font-family: var(--disp); font-weight: 800; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 100%, 16px 100%);
+      transition: background 0.2s, transform 0.14s;
+    }
+    .now-cab .now-play:hover { background: var(--lime-hi); transform: translateY(-2px); }
+    .now-cab .now-play.playing { background: var(--red); color: #fff; }
+    .now-cab .now-play.idle { animation: attention 2.2s ease-in-out infinite; }
+    .now-cab .now-play svg { flex-shrink: 0; }
+
+    .now-isotipo {
+      display: flex; justify-content: center; align-items: center;
+      margin-top: 2.2rem; opacity: 0.5;
+      animation: isoFloat 5s ease-in-out infinite;
+    }
+    .now-isotipo svg { width: clamp(4rem, 9vw, 6rem); height: auto; }
+    @keyframes isoFloat { 0%,100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(-6px); opacity: 0.85; } }
+
+    .hero-scrim { margin-top: 2.2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    .stat-cell { background: var(--ink-2); padding: 1.1rem 1.2rem; }
+    .stat-cell .v { font-family: var(--disp); font-weight: 800; font-size: clamp(1.8rem,4vw,2.6rem); line-height: 1; color: var(--paper); }
+    .stat-cell .v b { color: var(--lime); }
+    .stat-cell .k { margin-top: 0.5rem; font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); }
+
+    .hero-cta { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.6rem; }
+    .hero-play {
+      display: inline-flex; align-items: center; gap: 0.7rem;
+      font-family: var(--disp); font-weight: 800; font-size: 1.15rem; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--ink); background: var(--lime); border: none;
+      padding: 1rem 1.7rem; cursor: pointer; text-decoration: none;
+      transition: transform 0.14s, background 0.2s;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 100%, 16px 100%);
+    }
+    .hero-play:hover { background: var(--lime-hi); transform: translateY(-2px); }
+    .hero-play.idle { animation: attention 2.2s ease-in-out infinite; }
+    .hero-play svg { flex-shrink: 0; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.55rem;
+      font-family: var(--disp); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--ink); background: var(--lime);
+      padding: 0.95rem 1.8rem; text-decoration: none; cursor: pointer;
+      transition: transform 0.14s, background 0.2s;
+    }
+    .btn:hover { background: var(--lime-hi); transform: translateY(-2px); }
+    .btn.ghost { background: transparent; color: var(--paper); border: 1px solid var(--hair); }
+    .btn.ghost:hover { border-color: var(--lime); color: var(--lime-hi); }
+
+    /* ---------- Sections ---------- */
+    section { padding: clamp(3.5rem, 8vw, 6rem) 0; position: relative; }
+    .alt { background: var(--ink-2); }
+    .section-head { margin-bottom: clamp(2rem, 5vw, 3rem); display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap; }
+    .section-head .ttl h2 { font-family: var(--disp); font-weight: 800; font-size: clamp(2.4rem, 6vw, 4rem); line-height: 0.9; text-transform: uppercase; margin-top: 0.4rem; }
+    .section-head .ttl h2 em { font-style: normal; color: var(--lime); }
+    .section-head .idx { font-family: var(--mono); font-size: 0.72rem; color: var(--dim); letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; text-align: right; }
+    .lede { color: var(--muted); max-width: 56ch; margin-top: 0.9rem; font-size: 1.02rem; }
+
+    /* ---------- Programación ---------- */
+    .sched-shell { border: 1px solid var(--line); background: var(--panel); }
+    .sched-bar { display: grid; grid-template-columns: 5rem 1fr auto; gap: 1rem; align-items: center; padding: 0.85rem 1.2rem; border-bottom: 1px solid var(--line); background: var(--ink-3); font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); }
+    .sched-row {
+      display: grid; grid-template-columns: 5rem 1fr auto; gap: 1rem; align-items: center;
+      padding: 1rem 1.2rem; border-top: 1px solid var(--hair); transition: background 0.16s, color 0.16s;
+    }
+    .sched-row:hover { background: rgba(240,242,230,0.03); }
+    .sched-time { font-family: var(--mono); font-weight: 700; font-size: 0.92rem; color: var(--lime); letter-spacing: 0.02em; }
+    .sched-time .to { color: var(--dim); font-weight: 400; }
+    .prog-name { font-family: var(--disp); font-weight: 700; font-size: 1.35rem; text-transform: uppercase; letter-spacing: 0.01em; }
+    .prog-dur { font-family: var(--mono); font-size: 0.66rem; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; }
+    .sched-row.now { background: rgba(162,198,20,0.1); }
+    .sched-row.now .prog-name { color: var(--lime-hi); }
+    .sched-row.now .prog-dur { color: var(--lime); }
+    .sched-row.now .sched-time::before { content: "►"; margin-right: 0.4rem; color: var(--lime); }
+
+    .daytabs { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+    .daytab {
+      font-family: var(--disp); font-weight: 700; font-size: 1rem; letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--muted); background: transparent; border: 1px solid var(--hair);
+      padding: 0.6rem 1.2rem; cursor: pointer; transition: all 0.16s;
+    }
+    .daytab:hover { color: var(--paper); border-color: rgba(162,198,20,0.5); }
+    .daytab.active { background: var(--lime); color: var(--ink); border-color: var(--lime); font-weight: 800; }
+
+    /* ---------- Source selector (noticias) ---------- */
+    .srcbar { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+    .srcbar .lbl { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); margin-right: 0.2rem; }
+    .srctab {
+      font-family: var(--disp); font-weight: 700; font-size: 1rem; letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--muted); background: transparent; border: 1px solid var(--hair);
+      padding: 0.55rem 1.1rem; cursor: pointer; transition: all 0.16s;
+    }
+    .srctab:hover { color: var(--paper); border-color: rgba(162,198,20,0.5); }
+    .srctab.active { background: var(--lime); color: var(--ink); border-color: var(--lime); font-weight: 800; }
+    @media (max-width: 620px) {
+      .srcbar .lbl { display: block; width: 100%; }
+    }
+
+    /* ---------- Golpes (chart) ---------- */
+    .golpes-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.4rem; align-items: start; }
+    .golpes-right { display: grid; gap: 1.4rem; }
+    .chart { border: 1px solid var(--line); background: var(--panel); overflow: hidden; }
+    .chart-head { display: flex; align-items: center; gap: 0.9rem; padding: 0.95rem 1.2rem; border-bottom: 1px solid var(--line); background: var(--ink-3); }
+    .chart-head .cd { display: flex; align-items: center; gap: 0.8rem; }
+    .chart-head .cd .num { font-family: var(--disp); font-weight: 800; font-size: 1.9rem; line-height: 1; color: var(--lime); }
+    .chart-head .text .title { font-family: var(--disp); font-weight: 800; font-size: 1.25rem; text-transform: uppercase; line-height: 1; }
+    .chart-head .text .sub { font-family: var(--mono); font-size: 0.62rem; color: var(--dim); letter-spacing: 0.14em; text-transform: uppercase; margin-top: 0.25rem; }
+    .chart-head .mark { margin-left: auto; font-family: var(--mono); font-size: 0.6rem; color: var(--dim); letter-spacing: 0.14em; }
+
+    .chart-row { display: grid; grid-template-columns: 2.8rem 1fr auto; gap: 1rem; align-items: center; padding: 0.72rem 1.2rem; border-top: 1px solid rgba(240,242,230,0.06); }
+    .chart-row .pos { font-family: var(--disp); font-weight: 800; font-size: 1.3rem; color: var(--dim); text-align: center; line-height: 1; }
+    .chart-row.top3 .pos { color: var(--lime); }
+    .chart-row .song { font-family: var(--disp); font-weight: 600; font-size: 1.12rem; line-height: 1.1; text-transform: uppercase; }
+    .chart-row .artist { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.04em; }
+    .chart-row .delta { font-family: var(--mono); font-size: 0.72rem; color: var(--dim); }
+    .chart-row .delta.up { color: var(--lime-hi); }
+    .chart-row .delta.down { color: var(--red); }
+
+    .chart-row.section { grid-template-columns: 1fr; font-family: var(--mono); font-weight: 500; letter-spacing: 0.16em; font-size: 0.66rem; text-transform: uppercase; color: var(--dim); padding: 0.6rem 1.2rem; background: rgba(240,242,230,0.02); }
+    .chart-empty { padding: 2.5rem 1.4rem; text-align: center; color: var(--muted); font-family: var(--mono); font-size: 0.8rem; }
+
+    .sheet-note { margin-top: 1.1rem; font-family: var(--mono); font-size: 0.68rem; color: var(--dim); }
+    .sheet-note a { color: var(--lime); text-decoration: none; }
+    .sheet-note a:hover { text-decoration: underline; }
+
+    /* ---------- Noticias ---------- */
+    .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.4rem; }
+    .news-card {
+      background: var(--panel); border: 1px solid var(--line);
+      display: flex; flex-direction: column; text-decoration: none; color: inherit; overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .news-card:hover { transform: translateY(-4px); border-color: rgba(162,198,20,0.5); }
+    .news-media { aspect-ratio: 16/9; background: var(--ink-3); position: relative; overflow: hidden; }
+    .news-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .news-media .cat {
+      position: absolute; top: 0.7rem; left: 0.7rem; z-index: 2;
+      font-family: var(--mono); font-weight: 700; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase;
+      background: rgba(10,12,8,0.8); color: var(--lime-hi); padding: 0.32rem 0.6rem; border: 1px solid var(--line);
+    }
+    .news-media .num { position: absolute; bottom: 0.6rem; right: 0.8rem; font-family: var(--disp); font-weight: 800; font-size: 2.6rem; line-height: 1; color: rgba(240,242,230,0.2); }
+    .news-body { padding: 1rem 1.15rem 1.1rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+    .news-body h3 { font-family: var(--disp); font-weight: 700; font-size: 1.22rem; line-height: 1.1; text-transform: none; letter-spacing: 0.01em; }
+    .news-body p { color: var(--muted); font-size: 0.88rem; flex: 1; }
+    .news-meta { display: flex; align-items: center; gap: 0.5rem; font-family: var(--mono); font-size: 0.62rem; color: var(--dim); letter-spacing: 0.06em; text-transform: uppercase; }
+    .news-meta .src { color: var(--lime); font-weight: 700; }
+    .news-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--dim); }
+
+    .news-fallback { grid-column: 1/-1; border: 1px dashed var(--line); padding: 3rem 2rem; text-align: center; color: var(--muted); font-family: var(--mono); font-size: 0.8rem; }
+
+    /* ---------- Contacto ---------- */
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+    .contact-list { display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 1.6rem; }
+    .contact-item { display: flex; gap: 1rem; align-items: center; background: var(--ink-2); padding: 1.1rem 1.2rem; }
+    .contact-item .ic { width: 2.7rem; height: 2.7rem; flex-shrink: 0; display: grid; place-items: center; border: 1px solid var(--line); color: var(--lime); background: var(--panel); }
+    .contact-item .k { font-family: var(--mono); font-size: 0.6rem; color: var(--dim); letter-spacing: 0.14em; text-transform: uppercase; }
+    .contact-item .v { font-family: var(--disp); font-weight: 600; font-size: 1.25rem; }
+    .contact-item .v a { color: var(--paper); text-decoration: none; }
+    .contact-item .v a:hover { color: var(--lime-hi); }
+
+    .form-card { background: var(--panel); border: 1px solid var(--line); padding: 1.6rem; }
+    .form-card label { display: block; font-family: var(--mono); font-size: 0.64rem; color: var(--dim); margin: 0.95rem 0 0.4rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .form-card input, .form-card textarea { width: 100%; background: var(--ink); border: 1px solid var(--line); color: var(--paper); padding: 0.8rem 1rem; font-family: var(--body); font-size: 0.95rem; transition: border-color 0.2s; }
+    .form-card input:focus, .form-card textarea:focus { outline: none; border-color: var(--lime); }
+    .form-card textarea { min-height: 7rem; resize: vertical; }
+    .form-card button { margin-top: 1.2rem; width: 100%; border: none; }
+    #form-status { font-family: var(--mono); font-size: 0.78rem; color: var(--lime-hi); margin-top: 0.8rem; min-height: 1.2em; }
+
+    /* ---------- Footer ---------- */
+    footer { border-top: 1px solid var(--line); padding: 2rem 0 clamp(2rem, 6vw, 3.5rem); }
+    footer .wrap { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-family: var(--mono); font-size: 0.66rem; color: var(--dim); letter-spacing: 0.08em; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--lime-hi); }
+
+    /* ---------- Install bar ---------- */
+    #install-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 9990;
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.9rem 1.3rem; padding-bottom: calc(0.9rem + env(safe-area-inset-bottom));
+      background: rgba(10,12,8,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--line);
+      transform: translateY(110%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    #install-bar.show { transform: translateY(0); }
+    #install-bar span { flex: 1; font-family: var(--mono); font-size: 0.74rem; color: var(--muted); }
+    #install-bar span b { color: var(--lime-hi); }
+    #install-bar .dismiss { background: none; border: none; color: var(--dim); font-size: 1.4rem; cursor: pointer; line-height: 1; }
+    #install-bar .install {
+      background: var(--lime); color: var(--ink); border: none;
+      font-family: var(--disp); font-weight: 800; font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 0.6rem 1.3rem; cursor: pointer; white-space: nowrap;
+    }
+    #install-bar .install:hover { background: var(--lime-hi); }
+
+    /* big display mark divider */
+    .bandmark { display: block; margin: 0 auto; text-align: center; font-family: var(--disp); font-weight: 800; letter-spacing: 0.5em; color: transparent; -webkit-text-stroke: 1px rgba(162,198,20,0.5); text-transform: uppercase; overflow: hidden; white-space: nowrap; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 900px) {
+      .golpes-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .meta-readout .nm { display: none; }
+    }
+    @media (max-width: 620px) {
+      .brand .sub { display: none; }
+      .playbtn .txt { display: none; }
+      .playbtn { padding: 0.62rem; width: 2.8rem; }
+      .sched-bar, .sched-row { grid-template-columns: 4.2rem 1fr; }
+      .sched-bar .col3, .sched-row .prog-dur { display: none; }
+      .freq-hero { grid-template-columns: 1fr; }
+      .news-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="noise"></div>
+  <div class="bg-aurora"></div>
+  <div class="bg-dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+  <!-- Ticker tape -->
+  <div class="tape">
+    <div class="rail">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 3h5v5M21 3l-7.5 7.5"/><path d="M3 10a9 9 0 0 1 9-9 6 6 0 0 1 4 1.5M21 14a9 9 0 0 1-9 9 6 6 0 0 1-4-1.5"/></svg>
+      Señal
+    </div>
+    <div class="stream" id="tape-stream">
+      <span>Radio Poder <b>95.3 FM</b> <i>●</i> Somos parte de tu vida <i>◆</i> Ahora: <b id="tape-now">—</b> <i>◆</i> Transmisión <b>24/7</b> <i>◆</i> Golpes de la semana <i>●</i></span>
+      <span aria-hidden="true">Radio Poder <b>95.3 FM</b> <i>●</i> Somos parte de tu vida <i>◆</i> Ahora: <b id="tape-now-dup">—</b> <i>◆</i> Transmisión <b>24/7</b> <i>◆</i> Golpes de la semana <i>●</i></span>
+    </div>
+  </div>
+
+  <!-- Player bar -->
+  <div id="playerbar">
+    <div class="wrap">
+      <a class="brand" href="#top">
+        <span class="mark">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" stroke="#a2c614" stroke-width="1.6"/>
+            <path d="M9 8.5v7M15 8.5v7M10.5 10.5v3M13.5 10.5v3" stroke="#f0f2e6" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </a>
+      <div class="meta-readout">
+        <span class="nm" id="meta-now">Ahora: <b>—</b></span>
+        <span class="tm" id="meta-clock">--:--:-- GMT-5</span>
+      </div>
+      <span class="live-pill" id="livepill">En vivo</span>
+      <button class="playbtn idle" id="playbtn" aria-label="Reproducir en vivo">
+        <svg id="playicon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        <span class="txt">Escuchar</span>
+        <span class="hint">PLAY</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <header id="top">
+    <div class="hero-bg"></div>
+    <div class="wrap">
+      <div class="hero-topline">
+        <span class="tag"><span class="lbl">MOD.</span> FM STEREO · <span class="lbl">FREC.</span> 95.3</span>
+        <span class="clk" id="hero-clock">SINTONIZANDO…</span>
+      </div>
+
+      <div class="freq-hero">
+        <div class="freq-num">
+          <img class="hero-logo" src="https://radiopoderfm.com/wp-content/uploads/2025/10/LogoVerde.png" alt="Radio Poder 95.3 FM" />
+          <span class="capt"><span class="call">95.3 FM · SONICA</span><span>TW / / EN VIVO</span></span>
+        </div>
+        <div class="dial-panel">
+          <span class="tag"><span class="lbl">MODULACIÓN</span> EN VIVO</span>
+          <div class="vumeter" id="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="dial-scale"><span>88</span><span>92</span><span>95.3</span><span>98</span><span>102</span><span>108</span></div>
+          <div class="dial-readout"><span>SWR <b>ALTA</b></span><span>MOD <b>LIVE</b></span><span>TX <b>ACTIVO</b></span></div>
+        </div>
+      </div>
+
+      <div class="now-cab">
+        <div class="left">
+          <div class="row1"><span class="tag"><span class="lbl">AHORA ESCUCHAS</span></span> <span class="rec">● REC</span></div>
+          <div class="pname" id="onair-name">Cargando…</div>
+          <div class="ptime" id="onair-time">De — a — · GMT-5</div>
+        </div>
+        <button class="now-play idle" id="now-play" aria-label="Reproducir en vivo">
+          <svg id="now-picon" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          <span id="now-ptxt">Escuchar en vivo</span>
+        </button>
+      </div>
+
+      <div class="now-isotipo" aria-hidden="true">
+        <svg width="90" height="90" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="#a2c614" stroke-width="0.7"/>
+          <path d="M9 8.5v7M15 8.5v7M10.5 10.5v3M13.5 10.5v3" stroke="#f0f2e6" stroke-width="0.9" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="hero-scrim">
+        <div class="stat-cell"><div class="v">24/<b>7</b></div><div class="k">Transmisión continua</div></div>
+        <div class="stat-cell"><div class="v">95.3 <b>FM</b></div><div class="k">Frecuencia modulada</div></div>
+        <div class="stat-cell"><div class="v" id="stat-progs">—</div><div class="k">Programas en la semana</div></div>
+      </div>
+
+      <div class="hero-cta">
+        <button class="hero-play idle" id="hero-play">
+          <svg id="hero-picon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          <span id="hero-ptxt">Escuchar en vivo</span>
+        </button>
+        <a class="btn ghost" href="#programacion">Ver programación</a>
+        <a class="btn ghost" href="#golpes">Golpes de la semana</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Programación -->
+  <section id="programacion" class="alt">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="ttl">
+          <span class="tag"><span class="lbl">SEC. 01</span> /// PARRILLA SEMANAL</span>
+          <h2>Programación</h2>
+        </div>
+        <div class="idx">Hora GMT-5 · <b style="color:var(--lime)">►</b> = al aire</div>
+      </div>
+      <div class="daytabs" id="daytabs" role="tablist"></div>
+      <div class="sched-shell">
+        <div class="sched-bar"><span>TEMA</span><span>EMISIÓN</span><span class="col3">DURACIÓN</span></div>
+        <div id="sched"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Golpes de la semana -->
+  <section id="golpes">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="ttl">
+          <span class="tag"><span class="lbl">SEC. 02</span> /// SIGNADOS EN VIVO</span>
+          <h2>Golpes de <em>la semana</em></h2>
+        </div>
+        <div class="idx">Auto-actualizado · Google Sheets</div>
+      </div>
+      <div class="golpes-grid">
+        <div class="chart">
+          <div class="chart-head">
+            <div class="cd"><span class="num">30</span><div class="text"><div class="title">Top 30 Poder</div><div class="sub">Lo más sonado del aire</div></div></div>
+            <span class="mark">LISTA / 001</span>
+          </div>
+          <div id="chart-top-body"><div class="chart-empty">Cargando ranking…</div></div>
+        </div>
+        <div class="golpes-right">
+          <div class="chart">
+            <div class="chart-head">
+              <div class="cd"><span class="num">▲</span><div class="text"><div class="title">Probabilidades</div><div class="sub">Entrando al top</div></div></div>
+            </div>
+            <div id="chart-probs-body"><div class="chart-empty">Cargando…</div></div>
+          </div>
+          <div class="chart">
+            <div class="chart-head">
+              <div class="cd"><span style="color:var(--red)" class="num">▼</span><div class="text"><div class="title">Salieron</div><div class="sub">Fuera del ranking</div></div></div>
+            </div>
+            <div id="chart-salen-body"><div class="chart-empty">Cargando…</div></div>
+          </div>
+        </div>
+      </div>
+      <p class="sheet-note">FUENTE: hoja pública <a href="https://docs.google.com/spreadsheets/d/1Wn5Jb_wdsgvXkNRwrFB0ev3UYGHwl5WR/edit" target="_blank" rel="noopener">GOLPES DE LA SEMANA</a> · columnas: posición, canción, artista</p>
+    </div>
+  </section>
+
+  <!-- Noticias -->
+  <section id="noticias" class="alt">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="ttl">
+          <span class="tag"><span class="lbl">SEC. 03</span> /// NOTICIAS EN VIVO</span>
+          <h2>Noticias</h2>
+        </div>
+        <div class="idx">diarios digitales · RSS · actualización automática</div>
+      </div>
+      <div class="lede">Los principales titulares de Ecuador y el mundo, publicados por diarios digitales y actualizados automáticamente en el aire de Radio Poder. Elige la fuente.</div>
+      <div class="srcbar" id="srcbar">
+        <span class="lbl">Fuente ▸</span>
+      </div>
+      <div class="news-grid" id="news-grid">
+        <div class="news-fallback">Cargando noticias… conectando con el feed RSS.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacto -->
+  <section id="contacto">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="ttl">
+          <span class="tag"><span class="lbl">SEC. 04</span> /// CABLE DIRECTO</span>
+          <h2>Contacto</h2>
+        </div>
+      </div>
+      <div class="contact-grid">
+        <div>
+          <p class="lede">¿Quieres pautar, saludar al aire o darnos una idea? Abre un canal directo con la cabina.</p>
+          <div class="contact-list">
+            <div class="contact-item">
+              <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg></div>
+              <div>
+                <div class="k">Email</div>
+                <div class="v"><a href="mailto:info@radiopoderfm.com">info@radiopoderfm.com</a></div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+              <div>
+                <div class="k">Web</div>
+                <div class="v"><a href="https://radiopoderfm.com" target="_blank" rel="noopener">radiopoderfm.com</a></div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 4.56a9.94 9.94 0 0 1-2.83.78 4.93 4.93 0 0 0 2.17-2.72 9.9 9.9 0 0 1-3.13 1.2 4.92 4.92 0 0 0-8.39 4.49 13.96 13.96 0 0 1-10.14-5.14 4.92 4.92 0 0 0 1.52 6.57 4.9 4.9 0 0 1-2.23-.62v.06a4.92 4.92 0 0 0 3.95 4.83 4.94 4.94 0 0 1-2.22.08 4.93 4.93 0 0 0 4.6 3.42A9.88 9.88 0 0 1 0 19.54a13.94 13.94 0 0 0 7.55 2.21c9.05 0 14-7.5 14-14v-.63A10 10 0 0 0 24 4.56z"/></svg></div>
+              <div>
+                <div class="k">Redes</div>
+                <div class="v"><a href="https://x.com/radiopoderfm" target="_blank" rel="noopener">@radiopoderfm</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <form class="form-card" id="contact-form">
+          <label for="cf-nombre">Nombre</label>
+          <input id="cf-nombre" name="nombre" type="text" required placeholder="Tu nombre" autocomplete="name" />
+          <label for="cf-email">Email</label>
+          <input id="cf-email" name="email" type="email" required placeholder="tucorreo@ejemplo.com" autocomplete="email" />
+          <label for="cf-msg">Mensaje</label>
+          <textarea id="cf-msg" name="mensaje" required placeholder="Escribe tu mensaje…"></textarea>
+          <button class="btn" type="submit">Enviar mensaje</button>
+          <p id="form-status"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <span>© <span id="year"></span> RADIO PODER 95.3 FM · <a href="https://radiopoderfm.com" target="_blank" rel="noopener">radiopoderfm.com</a></span>
+      <span>SERIAL / RP-9&nbsp;5&nbsp;3</span>
+    </div>
+  </footer>
+
+  <aside id="install-bar">
+    <button class="dismiss" id="install-dismiss" aria-label="Cerrar">&times;</button>
+    <span>Instala <b>Radio Poder</b> en tu pantalla de inicio</span>
+    <button class="install" id="install-btn">Instalar</button>
+  </aside>
+
+  <script>
+    /* =========================================================
+       CONFIGURACIÓN
+       Cambia aquí las fuentes de datos sin tocar el resto del código.
+       ========================================================= */
+    var CONFIG = {
+      streamUrl: "https://streamingecuador.net:7044/radiopoder",
+      streamType: "icecast2",
+      timezoneOffset: -300, // GMT-5 (Ecuador), en minutos
+      rssFeeds: [
+        { name: "Primicias", url: "https://www.primicias.ec/rss/home.xml", home: "https://www.primicias.ec" },
+        { name: "Hora 32", url: "https://hora32.com.ec/feed/", home: "https://hora32.com.ec" }
+      ],
+      sheetsUrl: "https://docs.google.com/spreadsheets/d/1Wn5Jb_wdsgvXkNRwrFB0ev3UYGHwl5WR/gviz/tq?tqx=out:csv",
+      cid: "1Wn5Jb_wdsgvXkNRwrFB0ev3UYGHwl5WR"
+    };
+
+    /* =========================================================
+       PROGRAMACIÓN (extraída del sitio actual de la radio)
+       ========================================================= */
+    var PROGRAMACION = {
+      lunes: [
+        { programa: "Música Libre", inicio: "00:00", fin: "06:00" },
+        { programa: "A Primera Hora", inicio: "06:00", fin: "08:30" },
+        { programa: "Todo Cambia", inicio: "08:30", fin: "11:30" },
+        { programa: "El Sol Ya Estaba Ahí", inicio: "11:30", fin: "15:00" },
+        { programa: "Tardes de Poder", inicio: "15:00", fin: "18:00" },
+        { programa: "Música Libre", inicio: "18:00", fin: "23:59" }
+      ],
+      martes: [
+        { programa: "Música Libre", inicio: "00:00", fin: "06:00" },
+        { programa: "A Primera Hora", inicio: "06:00", fin: "08:30" },
+        { programa: "Todo Cambia", inicio: "08:30", fin: "11:30" },
+        { programa: "El Sol Ya Estaba Ahí", inicio: "11:31", fin: "15:00" },
+        { programa: "Tardes de Poder", inicio: "15:00", fin: "18:00" },
+        { programa: "Música Libre", inicio: "18:00", fin: "23:59" }
+      ],
+      miercoles: [
+        { programa: "Música Libre", inicio: "00:00", fin: "06:00" },
+        { programa: "A Primera Hora", inicio: "06:00", fin: "08:30" },
+        { programa: "Todo Cambia", inicio: "08:30", fin: "11:30" },
+        { programa: "El Sol Ya Estaba Ahí", inicio: "11:30", fin: "15:00" },
+        { programa: "Tardes de Poder", inicio: "15:00", fin: "18:00" },
+        { programa: "Música Libre", inicio: "18:00", fin: "23:59" }
+      ],
+      jueves: [
+        { programa: "Música Libre", inicio: "00:00", fin: "06:00" },
+        { programa: "A Primera Hora", inicio: "06:00", fin: "08:30" },
+        { programa: "Todo Cambia", inicio: "08:30", fin: "11:30" },
+        { programa: "El Sol Ya Estaba Ahí", inicio: "11:30", fin: "15:00" },
+        { programa: "Tardes de Poder", inicio: "15:00", fin: "18:00" },
+        { programa: "Música Libre", inicio: "18:00", fin: "23:59" }
+      ],
+      viernes: [
+        { programa: "Música Libre", inicio: "00:00", fin: "06:00" },
+        { programa: "A Primera Hora", inicio: "06:00", fin: "08:30" },
+        { programa: "Todo Cambia", inicio: "08:30", fin: "11:30" },
+        { programa: "El Sol Ya Estaba Ahí", inicio: "11:30", fin: "15:00" },
+        { programa: "Tardes de Poder", inicio: "15:00", fin: "18:00" },
+        { programa: "Música Libre", inicio: "18:00", fin: "23:59" }
+      ],
+      sabado: [
+        { programa: "Música Libre", inicio: "00:00", fin: "11:00" },
+        { programa: "11 & 11", inicio: "11:00", fin: "13:00" },
+        { programa: "Música Libre", inicio: "13:00", fin: "15:00" },
+        { programa: "Golpes de la Semana", inicio: "15:00", fin: "17:00" },
+        { programa: "Música Libre", inicio: "17:00", fin: "23:59" }
+      ],
+      domingo: [
+        { programa: "Música Libre", inicio: "00:00", fin: "11:00" },
+        { programa: "Golpes de la Semana", inicio: "11:00", fin: "13:00" },
+        { programa: "Música Libre", inicio: "13:00", fin: "18:00" },
+        { programa: "Radio Reggae", inicio: "18:00", fin: "20:00" },
+        { programa: "Música Libre", inicio: "20:00", fin: "23:59" }
+      ]
+    };
+    var DIAS = ["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"];
+    var DIAS_LABEL = { lunes: "Lunes", martes: "Martes", miercoles: "Miércoles", jueves: "Jueves", viernes: "Viernes", sabado: "Sábado", domingo: "Domingo" };
+    var TEMA = { "lunes": "ROCK", "martes": "POP", "miercoles": "HITS", "jueves": "URBANO", "viernes": "BAILABLE", "sabado": "LATINO", "domingo": "REGGAE" };
+
+    /* ---------- Hora de Ecuador (GMT-5) ---------- */
+    function horaEcuador() {
+      var now = new Date();
+      var utc = now.getTime() + now.getTimezoneOffset() * 60000;
+      return new Date(utc + CONFIG.timezoneOffset * 60000);
+    }
+    function hhmm(d) { return d.toTimeString().slice(0, 5); }
+    function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+    function programaActual() {
+      var d = horaEcuador();
+      var dia = DIAS[d.getDay()];
+      var h = hhmm(d);
+      var list = PROGRAMACION[dia];
+      for (var i = 0; i < list.length; i++) {
+        if (h >= list[i].inicio && h < list[i].fin) return { dia: dia, programa: list[i], hora: h };
+      }
+      return { dia: dia, programa: null, hora: h };
+    }
+
+    // Reloj en vivo (GMT-5)
+    setInterval(function () {
+      var d = horaEcuador();
+      var s = pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+      var el = document.getElementById("hero-clock");
+      if (el) el.textContent = "RELOJ / " + s + " GMT-5";
+      var mc = document.getElementById("meta-clock");
+      if (mc) mc.textContent = s + " GMT-5";
+    }, 1000);
+
+    /* ---------- Player ---------- */
+    var audio = new Audio();
+    audio.preload = "none";
+    audio.crossOrigin = "anonymous";
+    audio.addEventListener("error", function () {
+      // Si el stream no admite CORS, amortiguar el error y continuar en silencio.
+      setPlaying(false);
+    });
+
+    var playing = false;
+    var playbtn = document.getElementById("playbtn");
+    var playicon = document.getElementById("playicon");
+    var heroPlay = document.getElementById("hero-play");
+    var heroPicon = document.getElementById("hero-picon");
+    var heroPtxt = document.getElementById("hero-ptxt");
+    var nowPlay = document.getElementById("now-play");
+    var nowPicon = document.getElementById("now-picon");
+    var nowPtxt = document.getElementById("now-ptxt");
+    var eqEl = document.getElementById("eq");
+    var livepill = document.getElementById("livepill");
+
+    function syncUi(state) {
+      playbtn.classList.toggle("playing", state);
+      playbtn.classList.toggle("idle", !state);
+      heroPlay.classList.toggle("playing", state);
+      heroPlay.classList.toggle("idle", !state);
+      if (nowPlay) { nowPlay.classList.toggle("playing", state); nowPlay.classList.toggle("idle", !state); }
+      eqEl.classList.toggle("paused", !state);
+      livepill.classList.toggle("onair", state);
+      playbtn.setAttribute("aria-label", state ? "Pausar" : "Reproducir en vivo");
+      var playGlyph = '<polygon points="6 3 20 12 6 21 6 3"/>';
+      var pauseGlyph = '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>';
+      playicon.innerHTML = state ? pauseGlyph : playGlyph;
+      if (heroPicon) heroPicon.innerHTML = state ? pauseGlyph : playGlyph;
+      if (nowPicon) nowPicon.innerHTML = state ? pauseGlyph : playGlyph;
+      playbtn.querySelector(".txt").textContent = state ? "En vivo" : "Escuchar";
+      if (heroPtxt) heroPtxt.textContent = state ? "En pausa" : "Escuchar en vivo";
+      if (nowPtxt) nowPtxt.textContent = state ? "En vivo" : "Escuchar en vivo";
+    }
+
+    function setPlaying(state) { playing = state; syncUi(state); }
+
+    /* ---------- VU meter real (Web Audio) ---------- */
+    var vuCtx = null, vuAnalyser = null, vuBars = [], vuData = null, vuRaf = null;
+    function initVu() {
+      if (vuAnalyser) return true;
+      try {
+        var bars = document.querySelectorAll("#eq i");
+        vuBars = Array.prototype.slice.call(bars);
+        var AC = window.AudioContext || window.webkitAudioContext;
+        vuCtx = new AC();
+        var src = vuCtx.createMediaElementSource(audio);
+        vuAnalyser = vuCtx.createAnalyser();
+        vuAnalyser.fftSize = 512;
+        vuAnalyser.smoothingTimeConstant = 0.72;
+        src.connect(vuAnalyser);
+        vuAnalyser.connect(vuCtx.destination);
+        vuData = new Uint8Array(vuAnalyser.frequencyBinCount);
+        return true;
+      } catch (e) { return false; }
+    }
+    function vuFrame() {
+      vuRaf = null;
+      if (!vuAnalyser || vuBars.length !== 9) return;
+      vuAnalyser.getByteFrequencyData(vuData);
+      // 9 bandas logarítmicas dentro del espectro (aprox. 20 Hz - 10 kHz).
+      var bands = [
+        Math.floor(1.5 * bu(36)),
+        Math.floor(bu(60)), Math.floor(bu(95)), Math.floor(bu(150)),
+        Math.floor(bu(240)), Math.floor(bu(380)), Math.floor(bu(600)),
+        Math.floor(bu(950)), Math.floor(bu(1500))
+      ];
+      for (var i = 0; i < 9; i++) {
+        var idx = Math.min(vuData.length - 1, bands[i]);
+        var lvl = vuData[idx] / 255;
+        var h = Math.max(4, Math.min(100, lvl * 100));
+        vuBars[i].style.height = h + "%";
+        vuBars[i].classList.toggle("hot", lvl > 0.85);
+      }
+      vuRaf = requestAnimationFrame(vuFrame);
+    }
+    function bu(freq) {
+      var nyq = (vuCtx ? vuCtx.sampleRate : 44100) / 2;
+      return freq / nyq * vuAnalyser.frequencyBinCount;
+    }
+    function startVu() {
+      if (!initVu()) return;
+      if (vuCtx && vuCtx.state === "suspended") {
+        var rp = vuCtx.resume();
+        if (rp) rp.catch(function () {});
+      }
+      if (vuRaf == null) vuRaf = requestAnimationFrame(vuFrame);
+    }
+    function stopVu() {
+      if (vuRaf != null) { cancelAnimationFrame(vuRaf); vuRaf = null; }
+      for (var i = 0; i < vuBars.length; i++) {
+        vuBars[i].style.height = "6%";
+        vuBars[i].classList.remove("hot");
+      }
+    }
+
+    function playStream() {
+      if (playing) { audio.pause(); stopVu(); return; }
+      if (!audio.src) audio.src = CONFIG.streamUrl;
+      startVu();
+      var p = audio.play();
+      if (p) p.catch(function () { setPlaying(false); });
+    }
+
+    function togglePlay() { playStream(); }
+
+    function autoPlay() {
+      if (!audio.src) audio.src = CONFIG.streamUrl;
+      startVu();
+      var p = audio.play();
+      if (p) p.catch(function () { setPlaying(false); });
+    }
+
+    playbtn.addEventListener("click", togglePlay);
+    heroPlay.addEventListener("click", togglePlay);
+    if (nowPlay) nowPlay.addEventListener("click", togglePlay);
+    audio.addEventListener("playing", function () { setPlaying(true); });
+    audio.addEventListener("pause", function () { setPlaying(false); });
+    audio.addEventListener("waiting", function () {
+      var txt = playbtn.querySelector(".txt");
+      if (txt && !playing) txt.textContent = "Conectando…";
+    });
+
+    // Desbloquear audio con el primer toque (móvil)
+    document.addEventListener("touchstart", function () {
+      if (!audio.src) audio.load();
+    }, { passive: true });
+
+    // Autoplay: intentar reproducir al cargar (los navegadores pueden bloquearlo,
+    // en ese caso el usuario solo debe presionar una vez el botón de escuchar).
+    document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(autoPlay, 1200);
+    });
+
+    /* ---------- On-air updates ---------- */
+    function actualizarAhora() {
+      var p = programaActual();
+      var n = document.getElementById("onair-name");
+      var t = document.getElementById("onair-time");
+      var mn = document.getElementById("meta-now");
+      var tap = document.getElementById("tape-now");
+      var tap2 = document.getElementById("tape-now-dup");
+      var name = p.programa ? p.programa.programa : "Fuera de programación";
+      if (n) n.textContent = name;
+      if (t) t.textContent = "De " + (p.programa ? p.programa.inicio : "--:--") + " a " + (p.programa ? p.programa.fin : "--:--") + " · GMT-5";
+      if (mn) mn.innerHTML = "Ahora: <b>" + name + "</b>";
+      if (tap) tap.textContent = "Radio Poder 95.3 FM · Somos parte de tu vida · Ahora: " + name;
+      if (tap2) tap2.textContent = tap.textContent;
+    }
+    actualizarAhora();
+    setInterval(actualizarAhora, 60000);
+
+    /* ---------- Programación tabs ---------- */
+    var tabDias = Object.keys(PROGRAMACION);
+    var activeDay = DIAS[horaEcuador().getDay()];
+
+    function renderSched(dia) {
+      var box = document.getElementById("sched");
+      var rows = PROGRAMACION[dia];
+      var h = hhmm(horaEcuador());
+      function dur(r) {
+        var a = r.inicio.split(":"), b = r.fin.split(":");
+        var m = parseInt(b[0], 10) * 60 + parseInt(b[1], 10) - (parseInt(a[0], 10) * 60 + parseInt(a[1], 10));
+        if (m <= 0) m += 24 * 60;
+        return Math.floor(m / 60) + "h " + (m % 60) + "m";
+      }
+      box.innerHTML = rows.map(function (r) {
+        var isNow = (r.inicio <= h && h < r.fin);
+        return '<div class="sched-row' + (isNow ? ' now' : '') + '">' +
+          '<div class="sched-time">' + r.inicio + '<span class="to">–' + r.fin + '</span></div>' +
+          '<div class="prog-name">' + r.programa + '</div>' +
+          '<div class="prog-dur">' + dur(r) + '</div>' +
+          '</div>';
+      }).join("");
+    }
+
+    var tabs = document.getElementById("daytabs");
+    tabDias.forEach(function (dia) {
+      var b = document.createElement("button");
+      b.className = "daytab" + (dia === activeDay ? " active" : "");
+      b.textContent = DIAS_LABEL[dia] + " · " + TEMA[dia];
+      b.setAttribute("role", "tab");
+      b.addEventListener("click", function () {
+        document.querySelectorAll(".daytab").forEach(function (x) { x.classList.remove("active"); });
+        b.classList.add("active");
+        renderSched(dia);
+      });
+      tabs.appendChild(b);
+    });
+    renderSched(activeDay);
+
+    document.getElementById("stat-progs").textContent = Object.keys(PROGRAMACION).reduce(function (a, d) { return a + PROGRAMACION[d].length; }, 0);
+
+    /* =========================================================
+       GOLPES DE LA SEMANA — Google Sheets (CSV via gviz)
+       ========================================================= */
+    function esc(t) {
+      return String(t == null ? "" : t)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    function parseCsv(text) {
+      var rows = [], lines = text.split("\n");
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i], row = [], curr = "", inQ = false;
+        for (var j = 0; j < line.length; j++) {
+          var c = line[j];
+          if (inQ) {
+            if (c === '"') { if (line[j + 1] === '"') { curr += '"'; j++; } else inQ = false; }
+            else curr += c;
+          } else {
+            if (c === '"') inQ = true;
+            else if (c === ',') { row.push(curr); curr = ""; }
+            else curr += c;
+          }
+        }
+        row.push(curr);
+        if (row.some(function (r) { return r.trim() !== ""; })) rows.push(row);
+      }
+      return rows;
+    }
+
+    function loadGolpes() {
+      fetch(CONFIG.sheetsUrl)
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+        .then(renderGolpes)
+        .catch(function () {
+          var msg = '<div class="chart-empty">NO SE PUDO CARGAR EL RANKING<br>verifica que la hoja esté publicada</div>';
+          ["chart-top-body", "chart-probs-body", "chart-salen-body"].forEach(function (id) { document.getElementById(id).innerHTML = msg; });
+        });
+    }
+
+    function renderGolpes(text) {
+      var rows = parseCsv(text);
+      var top = [], probs = [], salen = [], section = "top";
+      rows.forEach(function (r) {
+        var posRaw = (r[3] || "").trim();
+        var tema = (r[4] || "").trim();
+        var artista = (r[5] || "").trim();
+        if (/^salen/i.test(tema) || /^salidas/i.test(tema)) { section = "salen"; return; }
+        if (/^probabilid/i.test(tema)) { section = "probs"; return; }
+        if (/cargando|loading/i.test(tema)) return;
+        var item = { pos: parseInt(posRaw, 10), tema: tema, artista: artista };
+        if (!tema) return;
+        if (section === "probs") probs.push(item);
+        else if (section === "salen") salen.push(item);
+        else if (!isNaN(item.pos)) top.push(item);
+      });
+      top.sort(function (a, b) {
+        var pa = isNaN(a.pos) ? 999 : a.pos, pb = isNaN(b.pos) ? 999 : b.pos;
+        return pa - pb;
+      });
+      renderChart("chart-top-body", top, true);
+      renderChart("chart-probs-body", probs, false);
+      renderChart("chart-salen-body", salen, false);
+    }
+
+    function renderChart(id, items, numbered) {
+      var el = document.getElementById(id);
+      if (!items.length) { el.innerHTML = '<div class="chart-empty">SIN DATOS TODAVÍA</div>'; return; }
+      el.innerHTML = items.map(function (it, idx) {
+        var pos = numbered && !isNaN(it.pos) ? it.pos : (idx + 1);
+        var cls = numbered && pos <= 3 ? " top3" : "";
+        var pct = (it.artist && it.artist.indexOf("%") !== -1) ? it.artist : it.artist || "";
+        return '<div class="chart-row' + cls + '">' +
+          '<div class="pos">' + pos + '</div>' +
+          '<div><div class="song">' + esc(it.tema) + '</div>' +
+          '<div class="artist">' + esc(pct) + '</div></div>' +
+          '<div class="delta' + (cls ? ' up' : '') + '">TRACT</div>' +
+          '</div>';
+      }).join("");
+    }
+
+    loadGolpes();
+    setInterval(loadGolpes, 30 * 60000);
+
+    /* =========================================================
+       NOTICIAS — RSS con proxy CORS
+       ========================================================= */
+    var PROXIES = [
+      function (url) { return "https://api.allorigins.win/raw?url=" + encodeURIComponent(url); },
+      function (url) { return "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(url); },
+      function (url) { return "https://corsproxy.io/?url=" + encodeURIComponent(url); }
+    ];
+
+    function xmlToItems(xmlText, feedName) {
+      var items = [];
+      var doc = new DOMParser().parseFromString(xmlText, "text/xml");
+      if (doc.getElementsByTagName("parsererror").length) throw new Error("XML inválido");
+      var channelItems = doc.querySelectorAll("rss > channel > item");
+      if (!channelItems.length) channelItems = doc.getElementsByTagName("item");
+      Array.prototype.forEach.call(channelItems, function (item) {
+        var title = (item.querySelector("title") || {}).textContent || "";
+        var link = (item.querySelector("link") || {}).textContent || "";
+        var desc = (item.querySelector("description") || {}).textContent || "";
+        var pub = (item.querySelector("pubDate") || {}).textContent || "";
+        var cat = (item.querySelector("category") || {}).textContent || "";
+        var img = "";
+        var media = item.getElementsByTagName("media:content");
+        if (media.length && media[0].getAttribute("url")) img = media[0].getAttribute("url");
+        if (!img) {
+          var enc = item.getElementsByTagName("enclosure");
+          if (enc.length && enc[0].getAttribute("url") && enc[0].getAttribute("type") && enc[0].getAttribute("type").indexOf("image") === 0) img = enc[0].getAttribute("url");
+        }
+        if (!title || !link) return;
+        if (title.indexOf("Directorio de secciones") !== -1) return;
+        items.push({ title: title.trim(), link: link, desc: desc, pub: pub, cat: cat, img: img, src: feedName });
+      });
+      return items;
+    }
+
+    function fmtDate(iso) {
+      var d = new Date(iso);
+      if (isNaN(d)) return "";
+      return d.toLocaleDateString("es-EC", { day: "numeric", month: "short" });
+    }
+
+    function renderNews(all) {
+      var grid = document.getElementById("news-grid");
+      if (!all.length) {
+        grid.innerHTML = '<div class="news-fallback">NO HAY NOTICIAS DISPONIBLES<br>el feed no devolvió contenido</div>';
+        return;
+      }
+      grid.innerHTML = all.map(function (n, i) {
+        var img = n.img
+          ? '<img src="' + esc(n.img) + '" alt="' + esc(n.title) + '" loading="lazy" onerror="this.style.display=\'none\'">'
+          : "";
+        var cat = n.cat ? '<span class="cat">' + esc(n.cat) + '</span>' : "";
+        var cleanDesc = n.desc.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
+        return '<a class="news-card" href="' + esc(n.link) + '" target="_blank" rel="noopener">' +
+          '<div class="news-media">' + img + cat + '<span class="num">0' + (i + 1) + '</span></div>' +
+          '<div class="news-body"><h3>' + esc(n.title) + '</h3>' +
+          (cleanDesc ? '<p>' + esc(cleanDesc) + '…</p>' : "") +
+          '<div class="news-meta"><span class="src">' + esc(n.src) + ' · Diario Digital</span><span class="dot"></span><span>' + fmtDate(n.pub) + '</span></div></div></a>';
+      }).join("");
+    }
+
+    var activeSources = "all"; // "all" | index numérico
+
+    function buildSourceTabs() {
+      var bar = document.getElementById("srcbar");
+      var tabs = [{ label: "Todas", value: "all" }];
+      CONFIG.rssFeeds.forEach(function (f, i) { tabs.push({ label: f.name, value: i }); });
+      tabs.forEach(function (t) {
+        var b = document.createElement("button");
+        b.className = "srctab" + (activeSources === t.value ? " active" : "");
+        b.textContent = t.label;
+        b.addEventListener("click", function () {
+          document.querySelectorAll(".srctab").forEach(function (x) { x.classList.remove("active"); });
+          b.classList.add("active");
+          activeSources = t.value;
+          loadNewsWith(activeSources);
+        });
+        bar.appendChild(b);
+      });
+    }
+
+    function loadNewsWith(sel) {
+      var indices;
+      if (sel === "all") indices = CONFIG.rssFeeds.map(function (_, i) { return i; });
+      else indices = [parseInt(sel, 10)];
+      loadNews(indices, 0, []);
+    }
+
+    function loadNews(feedIndexes, proxyIndex, acc) {
+      acc = acc || [];
+      if (!feedIndexes.length) { renderNews(acc); return; }
+      var feed = CONFIG.rssFeeds[feedIndexes[0]];
+      var rest = feedIndexes.slice(1);
+      var tryProxy = function (pi) {
+        if (pi >= PROXIES.length) { loadNews(rest, 0, acc); return; }
+        var proxied = PROXIES[pi](feed.url);
+        fetch(proxied)
+          .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+          .then(function (text) {
+            var jsonLike = text.trim();
+            if (jsonLike.indexOf("{") === 0) {
+              var j = JSON.parse(jsonLike);
+              if (j.items) {
+                j.items.forEach(function (it) {
+                  var t = (it.title || "").trim();
+                  if (!t || t.indexOf("Directorio de secciones") !== -1) return;
+                  acc.push({ title: t, link: it.link || "", desc: it.description || "", pub: it.pubDate || "", cat: it.category || (it.categories || []).join(", "), img: it.enclosure && it.enclosure.link ? it.enclosure.link : "", src: feed.name });
+                });
+              }
+              loadNews(rest, 0, acc);
+              return;
+            }
+            acc = acc.concat(xmlToItems(text, feed.name));
+            loadNews(rest, 0, acc);
+          })
+          .catch(function () { tryProxy(pi + 1); });
+      };
+      tryProxy(proxyIndex);
+    }
+
+    buildSourceTabs();
+    loadNewsWith("all");
+    setInterval(function () { loadNewsWith(activeSources); }, 15 * 60000);
+
+    /* ---------- Formulario (mailto) ---------- */
+    document.getElementById("contact-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var nombre = document.getElementById("cf-nombre").value.trim();
+      var email = document.getElementById("cf-email").value.trim();
+      var msg = document.getElementById("cf-msg").value.trim();
+      var subject = encodeURIComponent("Contacto desde radiopoderfm.com — " + nombre);
+      var body = encodeURIComponent("Nombre: " + nombre + "\nEmail: " + email + "\n\n" + msg);
+      window.location.href = "mailto:info@radiopoderfm.com?subject=" + subject + "&body=" + body;
+      document.getElementById("form-status").textContent = "Se abrió tu cliente de correo. Gracias por escribirnos.";
+    });
+
+    /* ---------- PWA install ---------- */
+    var installPrompt = null;
+    var isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    window.addEventListener("beforeinstallprompt", function (evt) {
+      evt.preventDefault(); installPrompt = evt;
+      if (!isStandalone) showInstallBar();
+    });
+    window.addEventListener("appinstalled", function () { hideInstallBar(); });
+    function showInstallBar() {
+      var bar = document.getElementById("install-bar");
+      document.getElementById("install-btn").onclick = function () {
+        if (!installPrompt) return;
+        installPrompt.prompt();
+        installPrompt.userChoice.then(function (choice) { if (choice.outcome === "accepted") hideInstallBar(); installPrompt = null; });
+      };
+      document.getElementById("install-dismiss").onclick = hideInstallBar;
+      bar.classList.add("show");
+    }
+    function hideInstallBar() { document.getElementById("install-bar").classList.remove("show"); }
+    (function () {
+      var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      if (!isStandalone && isIOS) showInstallBar();
+    })();
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+    }
+  </script>
+</body>
+</html>
