@@ -265,6 +265,25 @@
     @keyframes vuPanic { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
     .vumeter.paused i { height: 6% !important; opacity: 0.25; }
 
+    .viz-zone { position: relative; min-height: 34px; }
+    .viz-canvas { display: none; width: 100%; height: 48px; }
+    .viz-canvas.on { display: block; }
+    .vumeter.off { display: none; }
+    .led-strip { display: none; gap: 3px; align-items: center; height: 24px; }
+    .led-strip.on { display: flex; }
+    .led-strip i { flex: 1; height: 4px; background: var(--hair); border-radius: 1px; transition: background 60ms; }
+    .led-strip i.hot { background: var(--lime); box-shadow: 0 0 5px rgba(162,198,20,0.7); }
+    .led-strip i.peak { background: var(--red); }
+    .viz-switch {
+      display: flex; align-items: center; justify-content: center; gap: 0.9rem;
+      border: 1px solid var(--hair); background: transparent; cursor: pointer;
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--dim); padding: 0.25rem 0.6rem; transition: color 0.15s, border-color 0.15s;
+    }
+    .viz-switch:hover { color: var(--lime); border-color: var(--lime); }
+    .viz-switch .vs-arr { font-size: 0.5rem; color: var(--muted); }
+    .viz-switch .vs-name { color: var(--paper); }
+
     .dial-readout { display: flex; justify-content: space-between; gap: 1rem; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.12em; color: var(--dim); text-transform: uppercase; }
     .dial-readout b { color: var(--paper); font-weight: 500; }
 
@@ -619,9 +638,18 @@
           <img class="hero-logo" src="https://radiopoderfm.com/wp-content/uploads/2025/10/LogoVerde.png" alt="Radio Poder 95.3 FM" />
           <span class="capt"><span class="call">95.3 FM · SONICA</span><span>TW / / EN VIVO</span></span>
         </div>
-        <div class="dial-panel">
+        <div class="dial-panel" id="dial-panel">
           <span class="tag"><span class="lbl">MODULACIÓN</span> EN VIVO</span>
-          <div class="vumeter" id="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="viz-zone">
+            <div class="vumeter" id="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <canvas class="viz-canvas" id="viz-canvas" width="280" height="48"></canvas>
+            <div class="led-strip" id="led-strip"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <button class="viz-switch" id="viz-switch" type="button" title="Cambiar visualizador">
+            <span class="vs-arr" aria-hidden="true">◀</span>
+            <span class="vs-name" id="viz-name">EQ</span>
+            <span class="vs-arr" aria-hidden="true">▶</span>
+          </button>
           <div class="dial-scale"><span>88</span><span>92</span><span>95.3</span><span>98</span><span>102</span><span>108</span></div>
           <div class="dial-readout"><span>SWR <b>ALTA</b></span><span>MOD <b>LIVE</b></span><span>TX <b>ACTIVO</b></span></div>
         </div>
@@ -974,13 +1002,17 @@
 
     function setPlaying(state) { playing = state; syncUi(state); }
 
-    /* ---------- VU meter real (Web Audio) ---------- */
-    var vuCtx = null, vuAnalyser = null, vuBars = [], vuData = null, vuRaf = null;
+    /* ---------- VU meter real + 5 visualizadores (Web Audio) ---------- */
+    var vuCtx = null, vuAnalyser = null, vuBars = [], vuLEDs = [], vuData = null, vuTime = null, vuRaf = null, vuCanvas = null;
+    var VIS_MODES = ["EQ", "OSCILOSCOPIO", "RADIAL", "BLOB", "LED"];
+    var visMode = 0; // índice del visualizador activo
     function initVu() {
       if (vuAnalyser) return true;
       try {
         var bars = document.querySelectorAll("#eq i");
         vuBars = Array.prototype.slice.call(bars);
+        vuLEDs = Array.prototype.slice.call(document.querySelectorAll("#led-strip i"));
+        vuCanvas = document.getElementById("viz-canvas");
         var AC = window.AudioContext || window.webkitAudioContext;
         vuCtx = new AC();
         var src = vuCtx.createMediaElementSource(audio);
@@ -990,29 +1022,151 @@
         src.connect(vuAnalyser);
         vuAnalyser.connect(vuCtx.destination);
         vuData = new Uint8Array(vuAnalyser.frequencyBinCount);
+        vuTime = new Uint8Array(vuAnalyser.fftSize);
+        applyVisualizer();
         return true;
       } catch (e) { return false; }
     }
+    function vuLevel() {
+      if (!vuAnalyser) return 0;
+      vuAnalyser.getByteFrequencyData(vuData);
+      var sum = 0, n = 0;
+      for (var i = 0; i < vuData.length; i++) { sum += vuData[i]; n++; }
+      return sum / n / 255;
+    }
     function vuFrame() {
       vuRaf = null;
-      if (!vuAnalyser || vuBars.length !== 9) return;
-      vuAnalyser.getByteFrequencyData(vuData);
-      // 9 bandas logarítmicas dentro del espectro (aprox. 20 Hz - 10 kHz).
-      var bands = [
-        Math.floor(1.5 * bu(36)),
-        Math.floor(bu(60)), Math.floor(bu(95)), Math.floor(bu(150)),
-        Math.floor(bu(240)), Math.floor(bu(380)), Math.floor(bu(600)),
-        Math.floor(bu(950)), Math.floor(bu(1500))
-      ];
-      for (var i = 0; i < 9; i++) {
-        var idx = Math.min(vuData.length - 1, bands[i]);
-        var lvl = vuData[idx] / 255;
-        var h = Math.max(4, Math.min(100, lvl * 100));
-        vuBars[i].style.height = h + "%";
-        vuBars[i].classList.toggle("hot", lvl > 0.85);
+      if (!vuAnalyser || !vuBars.length) return;
+      if (visMode === 0) {
+        // EQ: 9 barras logarítmicas
+        vuAnalyser.getByteFrequencyData(vuData);
+        var bands = [
+          Math.floor(1.5 * bu(36)), Math.floor(bu(60)), Math.floor(bu(95)), Math.floor(bu(150)),
+          Math.floor(bu(240)), Math.floor(bu(380)), Math.floor(bu(600)),
+          Math.floor(bu(950)), Math.floor(bu(1500))
+        ];
+        for (var i = 0; i < 9; i++) {
+          var idx = Math.min(vuData.length - 1, bands[i]);
+          var lvl = vuData[idx] / 255;
+          var h = Math.max(4, Math.min(100, lvl * 100));
+          vuBars[i].style.height = h + "%";
+          vuBars[i].classList.toggle("hot", lvl > 0.85);
+        }
+      } else if (visMode === 1) {
+        drawOscilloscope();
+      } else if (visMode === 2) {
+        drawRadial();
+      } else if (visMode === 3) {
+        drawBlob();
+      } else if (visMode === 4) {
+        drawLED();
       }
       vuRaf = requestAnimationFrame(vuFrame);
     }
+
+    function drawOscilloscope() {
+      if (!vuCanvas) return;
+      vuAnalyser.getByteTimeDomainData(vuTime);
+      var ctx = vuCanvas.getContext("2d");
+      var W = vuCanvas.width, H = vuCanvas.height;
+      ctx.fillStyle = "rgba(17,19,14,0.55)";
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = "#cfe23c";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      var first = true;
+      for (var i = 0; i < vuTime.length; i++) {
+        var x = i / (vuTime.length - 1) * W;
+        var y = H / 2 + (vuTime[i] - 128) / 128 * (H / 2 - 2);
+        if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    function drawRadial() {
+      if (!vuCanvas) return;
+      vuAnalyser.getByteFrequencyData(vuData);
+      var ctx = vuCanvas.getContext("2d");
+      var W = vuCanvas.width, H = vuCanvas.height;
+      ctx.clearRect(0, 0, W, H);
+      var cx = W / 2, cy = H / 2, base = 6;
+      var n = 32;
+      ctx.strokeStyle = "#cfe23c";
+      for (var i = 0; i < n; i++) {
+        var ang = i / n * Math.PI * 2 - Math.PI / 2;
+        // índice de banda proporcional
+        var band = Math.floor(i / n * vuData.length);
+        var v = vuData[band] / 255;
+        var r = base + v * (H / 2 - 6);
+        var x = cx + Math.cos(ang) * r, y = cy + Math.sin(ang) * r;
+        ctx.beginPath();
+        ctx.arc(x, y, 1.4, 0, Math.PI * 2);
+        ctx.fillStyle = v > 0.85 ? "#e8922a" : "#cfe23c";
+        ctx.fill();
+      }
+      // núcleo
+      ctx.beginPath();
+      ctx.arc(cx, cy, base, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(162,198,20,0.4)";
+      ctx.fill();
+    }
+
+    function drawBlob() {
+      if (!vuCanvas) return;
+      vuAnalyser.getByteFrequencyData(vuData);
+      var ctx = vuCanvas.getContext("2d");
+      var W = vuCanvas.width, H = vuCanvas.height;
+      ctx.clearRect(0, 0, W, H);
+      var cx = W / 2, cy = H / 2;
+      var level = vuLevel();
+      var r = 5 + level * (H / 2 - 4);
+      var grad = ctx.createRadialGradient(cx, cy, r * 0.3, cx, cy, r);
+      grad.addColorStop(0, "rgba(162,198,20,0.85)");
+      grad.addColorStop(0.7, "rgba(162,198,20,0.35)");
+      grad.addColorStop(1, "rgba(232,146,42,0.1)");
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+    }
+
+    function drawLED() {
+      for (var i = 0; i < vuLEDs.length; i++) {
+        var seg = vuLEDs.length;
+        var lv = vuLevel();
+        var thr = (i + 1) / seg;
+        var on = lv >= thr;
+        vuLEDs[i].classList.toggle("hot", on && i < seg - 2);
+        vuLEDs[i].classList.toggle("peak", on && i >= seg - 2);
+        if (!on) vuLEDs[i].classList.remove("hot", "peak");
+      }
+    }
+
+    // Muestra/oculta el visualizador según el modo activo
+    function applyVisualizer() {
+      var eq = document.getElementById("eq");
+      var led = document.getElementById("led-strip");
+      var name = document.getElementById("viz-name");
+      if (name) name.textContent = VIS_MODES[visMode];
+      if (eq) eq.classList.toggle("off", visMode !== 0);
+      if (led) led.classList.toggle("on", visMode === 4);
+      if (vuCanvas) vuCanvas.classList.toggle("on", visMode === 1 || visMode === 2 || visMode === 3);
+      if (visMode === 4) { // asegurar LEDs apagados al entrar
+        for (var i = 0; i < vuLEDs.length; i++) vuLEDs[i].classList.remove("hot", "peak");
+      } else { // resetear altura de barras al salir de EQ no aplica
+      }
+      if (vuCanvas && visMode === 1) {
+        var ctx = vuCanvas.getContext("2d");
+        if (ctx) { ctx.fillStyle = "rgba(17,19,14,1)"; ctx.fillRect(0, 0, vuCanvas.width, vuCanvas.height); }
+      }
+    }
+
+    var vizSwitch = document.getElementById("viz-switch");
+    if (vizSwitch) vizSwitch.addEventListener("click", function () {
+      visMode = (visMode + 1) % VIS_MODES.length;
+      applyVisualizer();
+    });
+
     function bu(freq) {
       var nyq = (vuCtx ? vuCtx.sampleRate : 44100) / 2;
       return freq / nyq * vuAnalyser.frequencyBinCount;
