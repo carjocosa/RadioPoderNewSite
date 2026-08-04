@@ -295,6 +295,25 @@
     .now-cab .now-play.idle { animation: attention 2.2s ease-in-out infinite; }
     .now-cab .now-play svg { flex-shrink: 0; }
 
+    .now-playing {
+      margin-top: 0.75rem; border: 1px solid var(--line); background: rgba(17,19,14,0.7);
+      padding: 1rem 1.4rem; display: flex; flex-direction: column; gap: 0.5rem;
+      border-left: 2px solid var(--lime);
+    }
+    .now-playing .np-label {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.18em; color: var(--lime);
+    }
+    .now-playing .np-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: attention 1.6s ease-in-out infinite; }
+    .now-playing .np-body { display: flex; align-items: center; gap: 1rem; min-width: 0; }
+    .now-playing .np-cover { width: 4.2rem; height: 4.2rem; flex-shrink: 0; overflow: hidden; border: 1px solid var(--line); background: var(--panel); }
+    .now-playing .np-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .now-playing .np-cover img.na { opacity: 0; }
+    .now-playing .np-track { min-width: 0; }
+    .now-playing .np-song { font-family: var(--disp); font-weight: 800; font-size: clamp(1.2rem, 3vw, 1.9rem); line-height: 1.1; color: var(--fg); }
+    .now-playing .np-song.na { color: var(--dim); }
+    .now-playing .np-artist { font-family: var(--mono); font-size: 0.82rem; color: var(--muted); margin-top: 0.2rem; }
+
     .now-isotipo {
       display: flex; justify-content: center; align-items: center;
       margin-top: 2.2rem; opacity: 0.5;
@@ -618,6 +637,14 @@
           <svg id="now-picon" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
           <span id="now-ptxt">Escuchar en vivo</span>
         </button>
+      </div>
+
+      <div class="now-playing" id="now-playing">
+        <div class="np-label"><span class="np-dot"></span> SUENA AHORA</div>
+        <div class="np-body">
+          <div class="np-cover"><img id="np-cover" alt="" class="na"></div>
+          <div class="np-track"><div class="np-song" id="np-song">Sintonizando…</div><div class="np-artist" id="np-artist">&nbsp;</div></div>
+        </div>
       </div>
 
       <div class="now-isotipo" aria-hidden="true">
@@ -1049,17 +1076,73 @@
       var n = document.getElementById("onair-name");
       var t = document.getElementById("onair-time");
       var mn = document.getElementById("meta-now");
-      var tap = document.getElementById("tape-now");
-      var tap2 = document.getElementById("tape-now-dup");
       var name = p.programa ? p.programa.programa : "Fuera de programación";
       if (n) n.textContent = name;
       if (t) t.textContent = "De " + (p.programa ? p.programa.inicio : "--:--") + " a " + (p.programa ? p.programa.fin : "--:--") + " · GMT-5";
       if (mn) mn.innerHTML = "Ahora: <b>" + name + "</b>";
-      if (tap) tap.textContent = "Radio Poder 95.3 FM · Somos parte de tu vida · Ahora: " + name;
-      if (tap2) tap2.textContent = tap.textContent;
     }
     actualizarAhora();
     setInterval(actualizarAhora, 60000);
+
+    /* ---------- Canción actual vía Icecast status (metadata del stream) ---------- */
+    var npSong = document.getElementById("np-song");
+    var npArtist = document.getElementById("np-artist");
+    var tapeNow = document.getElementById("tape-now");
+    var tapeNow2 = document.getElementById("tape-now-dup");
+    function extraerTrack(raw) {
+      // El título viene con formato "Now On Air:Artista - Canción"
+      var s = String(raw || "").replace(/^Now On Air:\s*/i, "").trim();
+      if (!s) return null;
+      return s;
+    }
+    function splitTrack(s) {
+      var i = s.lastIndexOf(" - ");
+      if (i > 0) return { artist: s.slice(0, i).trim(), song: s.slice(i + 3).trim() };
+      return { artist: "", song: s };
+    }
+    function setTape(now) {
+      var txt = "Radio Poder <b>95.3 FM</b> <i>●</i> Somos parte de tu vida <i>◆</i> Ahora: <b>" + (now || "—") + "</b>";
+      if (tapeNow) tapeNow.innerHTML = txt;
+      if (tapeNow2) tapeNow2.innerHTML = txt;
+    }
+
+    function refreshNowPlaying() {
+      if (!("fetch" in window)) return;
+      fetch("https://streamingecuador.net:7044/status-json.xsl", { cache: "no-store" })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          var srcs = (j && j.icestats && j.icestats.source) || [];
+          var arr = Array.isArray(srcs) ? srcs : [srcs];
+          if (!arr.length) return;
+          // Elegir el mount que coincide con nuestro stream (/radiopoder)
+          var cur = (CONFIG.streamUrl || "").replace(/^https?:\/\//, "").split("/")[1] || "radiopoder";
+          var src = null;
+          for (var i = 0; i < arr.length; i++) {
+            var lu = String(arr[i].listenurl || "");
+            if (lu.indexOf("/" + cur) !== -1 || (arr[i].server_name || "").toLowerCase() === "radio poder") { src = arr[i]; break; }
+          }
+          if (!src) src = arr[0];
+          var track = extraerTrack(src.title) || (src.yp_currently_playing ? extraerTrack(src.yp_currently_playing) : null);
+          if (!track) return;
+          var promoRegex = /^sorry, service not available\.?\s*try again later\.?$/i;
+          if (promoRegex.test(track.trim())) {
+            if (npSong) { npSong.textContent = "Espacio Promocional y/o Publicitario"; npSong.classList.add("na"); }
+            if (npArtist) npArtist.textContent = "AM · FM · Radio Poder";
+            var coverEl = document.getElementById("np-cover");
+            if (coverEl) { coverEl.removeAttribute("src"); coverEl.classList.add("na"); }
+            setTape("Espacio Promocional y/o Publicitario");
+            return;
+          }
+          var parts = splitTrack(track);
+          if (npSong) { npSong.textContent = parts.song || "En el aire"; npSong.classList.remove("na"); }
+          if (npArtist) npArtist.textContent = parts.artist ? parts.artist + " · Radio Poder 95.3" : "Radio Poder 95.3 FM";
+          setTape(parts.song || parts.artist || "En el aire");
+          feedCover(document.getElementById("np-cover"), parts.song, parts.artist);
+        })
+        .catch(function () { /* sin conexión: dejar estado actual */ });
+    }
+    refreshNowPlaying();
+    setInterval(refreshNowPlaying, 30000);
 
     /* ---------- Programación tabs ---------- */
     var tabDias = Object.keys(PROGRAMACION);
@@ -1214,8 +1297,10 @@
     var artActive = 0;
     var ART_CONCURRENCY = 3;
     var ART_DELAY = 320; // ms entre arranques de lote (respetar throttling de Apple)
-    function artEnqueue(fn, onDone) {
-      artQueue.push({ run: fn, done: onDone });
+    function artEnqueue(fn, onDone, priority) {
+      var job = { run: fn, done: onDone };
+      if (priority) artQueue.unshift(job);
+      else artQueue.push(job);
       artPump();
     }
     function artPump() {
@@ -1238,20 +1323,12 @@
 
     function escAttr(s) { return String(s == null ? "" : s).replace(/"/g, "&quot;"); }
 
-    function feedArt(thumb, tema, artista) {
-      var img = thumb.querySelector("img");
-      var ph = thumb.querySelector(".ph");
+    // Núcleo reutilizable: resuelve/Setea la carátula (cache + cola + fuzzy).
+    // onResolve(imgUrl) se llama con "" si no hay arte.
+    function requestArt(tema, artista, onResolve, priority) {
       var key = (tema + "||" + artista).toLowerCase();
-      function setPh(txt) { if (ph) ph.innerHTML = txt; }
-      // Si ya estaba cargado/cacheado, usarlo
-      if (ART_CACHE[key]) {
-        var c = ART_CACHE[key];
-        if (c.img) { if (img) img.setAttribute("src", c.img); setPh(""); }
-        return;
-      }
-      setPh('<b>♪</b>');
+      if (ART_CACHE[key]) { onResolve(ART_CACHE[key].img || ""); return; }
       artEnqueue(function () {
-        // Cada fuente es tolerante a errores; si iTunes falla (throttle), probamos Deezer.
         return fetchFromItunes(tema, artista)
           .catch(function () { return null; })
           .then(function (r) {
@@ -1259,9 +1336,29 @@
             return fetchFromDeezer(tema, artista).catch(function () { return null; });
           });
       }, function (r) {
-        if (r) { ART_CACHE[key] = r; if (img) img.setAttribute("src", r.img); setPh(""); }
-        else { ART_CACHE[key] = { img: "" }; setPh("—"); }
+        var img = r && r.img ? r.img : "";
+        ART_CACHE[key] = { img: img };
+        onResolve(img);
+      }, priority);
+    }
+
+    function feedArt(thumb, tema, artista) {
+      var img = thumb.querySelector("img");
+      var ph = thumb.querySelector(".ph");
+      function setPh(txt) { if (ph) ph.innerHTML = txt; }
+      setPh('<b>♪</b>');
+      requestArt(tema, artista, function (url) {
+        if (url) { if (img) img.setAttribute("src", url); setPh(""); }
+        else setPh("—");
       });
+    }
+
+    function feedCover(imgEl, tema, artista) {
+      requestArt(tema, artista, function (url) {
+        if (!imgEl) return;
+        if (url) { imgEl.setAttribute("src", url); imgEl.classList.remove("na"); }
+        else imgEl.classList.add("na");
+      }, true);
     }
 
     // ---------- Búsqueda contextual (fuzzy) ----------
