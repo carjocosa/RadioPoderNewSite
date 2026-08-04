@@ -400,6 +400,8 @@
     .chart-row .delta { font-family: var(--mono); font-size: 0.72rem; color: var(--dim); }
     .chart-row .delta.up { color: var(--lime-hi); }
     .chart-row .delta.down { color: var(--red); }
+    .chart-row .delta.steady { color: var(--muted); }
+    .chart-row .delta-col { text-align: right; white-space: nowrap; }
 
     .chart-row.section { grid-template-columns: 1fr; font-family: var(--mono); font-weight: 500; letter-spacing: 0.16em; font-size: 0.66rem; text-transform: uppercase; color: var(--dim); padding: 0.6rem 1.2rem; background: rgba(240,242,230,0.02); }
     .chart-empty { padding: 2.5rem 1.4rem; text-align: center; color: var(--muted); font-family: var(--mono); font-size: 0.8rem; }
@@ -628,7 +630,7 @@
       <div class="golpes-grid">
         <div class="chart">
           <div class="chart-head">
-            <div class="cd"><span class="num">30</span><div class="text"><div class="title">Top 30 Poder</div><div class="sub">Lo más sonado del aire</div></div></div>
+            <div class="cd"><span class="num">30</span><div class="text"><div class="title">Top 30</div><div class="sub">Lo más sonado del aire</div></div></div>
             <span class="mark">LISTA / 001</span>
           </div>
           <div id="chart-top-body"><div class="chart-empty">Cargando ranking…</div></div>
@@ -648,7 +650,6 @@
           </div>
         </div>
       </div>
-      <p class="sheet-note">FUENTE: hoja pública <a href="https://docs.google.com/spreadsheets/d/1Wn5Jb_wdsgvXkNRwrFB0ev3UYGHwl5WR/edit" target="_blank" rel="noopener">GOLPES DE LA SEMANA</a> · columnas: posición, canción, artista</p>
     </div>
   </section>
 
@@ -813,7 +814,6 @@
     };
     var DIAS = ["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"];
     var DIAS_LABEL = { lunes: "Lunes", martes: "Martes", miercoles: "Miércoles", jueves: "Jueves", viernes: "Viernes", sabado: "Sábado", domingo: "Domingo" };
-    var TEMA = { "lunes": "ROCK", "martes": "POP", "miercoles": "HITS", "jueves": "URBANO", "viernes": "BAILABLE", "sabado": "LATINO", "domingo": "REGGAE" };
 
     /* ---------- Hora de Ecuador (GMT-5) ---------- */
     function horaEcuador() {
@@ -1030,7 +1030,7 @@
     tabDias.forEach(function (dia) {
       var b = document.createElement("button");
       b.className = "daytab" + (dia === activeDay ? " active" : "");
-      b.textContent = DIAS_LABEL[dia] + " · " + TEMA[dia];
+      b.textContent = DIAS_LABEL[dia];
       b.setAttribute("role", "tab");
       b.addEventListener("click", function () {
         document.querySelectorAll(".daytab").forEach(function (x) { x.classList.remove("active"); });
@@ -1088,12 +1088,13 @@
       var top = [], probs = [], salen = [], section = "top";
       rows.forEach(function (r) {
         var posRaw = (r[3] || "").trim();
+        var prevRaw = (r[2] || "").trim();
         var tema = (r[4] || "").trim();
         var artista = (r[5] || "").trim();
         if (/^salen/i.test(tema) || /^salidas/i.test(tema)) { section = "salen"; return; }
         if (/^probabilid/i.test(tema)) { section = "probs"; return; }
         if (/cargando|loading/i.test(tema)) return;
-        var item = { pos: parseInt(posRaw, 10), tema: tema, artista: artista };
+        var item = { pos: parseInt(posRaw, 10), prev: prevRaw, tema: tema, artista: artista };
         if (!tema) return;
         if (section === "probs") probs.push(item);
         else if (section === "salen") salen.push(item);
@@ -1108,6 +1109,16 @@
       renderChart("chart-salen-body", salen, false);
     }
 
+    function renderDelta(prev, pos) {
+      if (/nue|nuevo|new/i.test(prev)) return '<span class="delta up">NUEVO</span>';
+      var p = parseInt(prev, 10);
+      if (isNaN(p)) return '<span class="delta">—</span>';
+      var diff = pos - p;
+      if (diff < 0) return '<span class="delta up">▲ +' + (0 - diff) + '</span>';
+      if (diff > 0) return '<span class="delta down">▼ -' + diff + '</span>';
+      return '<span class="delta steady">=</span>';
+    }
+
     function renderChart(id, items, numbered) {
       var el = document.getElementById(id);
       if (!items.length) { el.innerHTML = '<div class="chart-empty">SIN DATOS TODAVÍA</div>'; return; }
@@ -1115,11 +1126,12 @@
         var pos = numbered && !isNaN(it.pos) ? it.pos : (idx + 1);
         var cls = numbered && pos <= 3 ? " top3" : "";
         var pct = (it.artist && it.artist.indexOf("%") !== -1) ? it.artist : it.artist || "";
+        var delta = numbered ? renderDelta(it.prev, pos) : "";
         return '<div class="chart-row' + cls + '">' +
           '<div class="pos">' + pos + '</div>' +
           '<div><div class="song">' + esc(it.tema) + '</div>' +
           '<div class="artist">' + esc(pct) + '</div></div>' +
-          '<div class="delta' + (cls ? ' up' : '') + '">TRACT</div>' +
+          '<div class="delta-col">' + delta + '</div>' +
           '</div>';
       }).join("");
     }
